@@ -1,0 +1,23 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      java: corretto17
+    commands:
+      - echo Installing Maven...
+      - curl -s https://apache.osuosl.org/maven/maven-3/3.8.4/binaries/apache-maven-3.8.4-bin.tar.gz | tar xz -C /opt
+      - export PATH=/opt/apache-maven-3.8.4/bin:$PATH
+  build:
+    commands:
+      - echo Building the application...
+      - mvn clean package -Passembly-zip
+  post_build:
+    commands:
+      - echo Build completed on `date`
+      - ls -l target
+      - mkdir -p output
+      - cp target/*.zip output/
+artifacts:
+  files:
+    - output/*.zip
