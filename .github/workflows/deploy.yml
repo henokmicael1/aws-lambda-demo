@@ -1,24 +1,20 @@
 name: Build and Deploy to AWS Lambda
 
-# When this workflow should run (on which branch push, pull request, etc.)
 on:
   push:
     branches:
-      - main  # This will trigger on pushes to the "main" branch
+      - main  # Trigger on push to the main branch
 
-# Define the workflow jobs
 jobs:
   build:
-    # The type of machine to run the job on
     runs-on: ubuntu-latest
 
-    # Steps define the individual tasks that will run in this job
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@v3
         with:
           java-version: '17'
 
@@ -29,13 +25,12 @@ jobs:
         run: zip -r my-lambda.zip target/*.jar
 
       - name: Upload Lambda Artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3  # Updated to v3
         with:
           name: my-lambda-artifact
           path: my-lambda.zip
 
   deploy:
-    # Specify that the deploy job depends on the success of the build job
     needs: build
     runs-on: ubuntu-latest
 
