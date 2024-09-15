@@ -22,11 +22,10 @@ jobs:
       - name: Build with Maven
         run: mvn clean package
 
-      # Verify that the ZIP file is created
       - name: List contents of target directory
         run: ls -la target/
 
-      # Since the ZIP is already built, upload it directly
+      # Upload ZIP file artifact for Lambda
       - name: Upload Lambda Artifact
         uses: actions/upload-artifact@v3
         with:
@@ -45,8 +44,15 @@ jobs:
           aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws configure set region us-east-1
 
+      # Download the artifact before deploying to Lambda
+      - name: Download Lambda Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: my-lambda-artifact
+
+      # Deploy to AWS Lambda
       - name: Deploy to AWS Lambda
         run: |
           aws lambda update-function-code \
-            --function-name my-lambda-function \
-            --zip-file fileb://target/aws-lambda-user-1.0-SNAPSHOT-lambda-package.zip
+            --function-name aws-lambda-user \
+            --zip-file fileb://my-lambda-artifact/aws-lambda-user-1.0-SNAPSHOT-lambda-package.zip
