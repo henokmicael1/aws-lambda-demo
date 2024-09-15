@@ -3,7 +3,9 @@ name: Build and Deploy to AWS Lambda
 on:
   push:
     branches:
-      - main
+      - main      # For production
+      - develop   # For development
+      - staging   # For staging
 
 jobs:
   build:
@@ -25,13 +27,6 @@ jobs:
       - name: List contents of target directory
         run: ls -la target/
 
-      # This step is just for logging (optional)
-      - name: Find and log ZIP file
-        run: |
-          ZIP_FILE=$(find target/ -name "*.zip")
-          echo "Found ZIP file: $ZIP_FILE"
-
-      # Upload the ZIP file
       - name: Upload Lambda Artifact
         uses: actions/upload-artifact@v3
         with:
@@ -56,11 +51,22 @@ jobs:
         with:
           name: my-lambda-artifact
 
-      # Deploy the downloaded ZIP file
+      # Choose the correct Lambda function based on the branch
+      - name: Set Lambda function name
+        run: |
+          if [[ "${{ github.ref }}" == "refs/heads/develop" ]]; then
+            echo "LAMBDA_FUNCTION_NAME=${{ secrets.DEV_LAMBDA_FUNCTION_NAME }}" >> $GITHUB_ENV
+          elif [[ "${{ github.ref }}" == "refs/heads/staging" ]]; then
+            echo "LAMBDA_FUNCTION_NAME=${{ secrets.STG_LAMBDA_FUNCTION_NAME }}" >> $GITHUB_ENV
+          elif [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            echo "LAMBDA_FUNCTION_NAME=${{ secrets.PROD_LAMBDA_FUNCTION_NAME }}" >> $GITHUB_ENV
+          fi
+
+      # Deploy to AWS Lambda
       - name: Deploy to AWS Lambda
         run: |
           ZIP_FILE=$(find . -name "*.zip")
-          echo "Deploying ZIP file: $ZIP_FILE"
+          echo "Deploying ZIP file: $ZIP_FILE to Lambda function: $LAMBDA_FUNCTION_NAME"
           aws lambda update-function-code \
-            --function-name aws-lambda-user1 \
+            --function-name $LAMBDA_FUNCTION_NAME \
             --zip-file fileb://$ZIP_FILE
