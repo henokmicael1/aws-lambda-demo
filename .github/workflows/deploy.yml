@@ -44,7 +44,7 @@ jobs:
           aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws configure set region us-east-1
 
-      # Download the artifact before deploying to Lambda
+      # Download the artifact
       - name: Download Lambda Artifact
         uses: actions/download-artifact@v3
         with:
@@ -55,4 +55,4 @@ jobs:
         run: |
           aws lambda update-function-code \
             --function-name aws-lambda-user \
-            --zip-file fileb://my-lambda-artifact/aws-lambda-user-1.0-SNAPSHOT-lambda-package.zip
+            --zip-file fileb://aws-lambda-user-1.0-SNAPSHOT-lambda-package.zip
