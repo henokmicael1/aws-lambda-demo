@@ -62,5 +62,5 @@ jobs:
           ZIP_FILE=$(find . -name "*.zip")
           echo "Deploying ZIP file: $ZIP_FILE"
           aws lambda update-function-code \
-            --function-name aws-lambda-user \
+            --function-name aws-lambda-user1 \
             --zip-file fileb://$ZIP_FILE
