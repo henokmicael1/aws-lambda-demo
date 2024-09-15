@@ -14,6 +14,8 @@ public class UserService {
 
     // Create a new user
     public User createUser(User user) {
+        user.setUsername("HENOK");
+        user.setPassword("MICALE");
         users.add(user);
         return user;
     }
