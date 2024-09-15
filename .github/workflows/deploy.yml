@@ -25,11 +25,14 @@ jobs:
       - name: List contents of target directory
         run: ls -la target/
 
-      # Upload the dynamically found ZIP file artifact for Lambda
-      - name: Upload Lambda Artifact
+      # This step is just for logging (optional)
+      - name: Find and log ZIP file
         run: |
           ZIP_FILE=$(find target/ -name "*.zip")
           echo "Found ZIP file: $ZIP_FILE"
+
+      # Upload the ZIP file
+      - name: Upload Lambda Artifact
         uses: actions/upload-artifact@v3
         with:
           name: my-lambda-artifact
@@ -53,7 +56,7 @@ jobs:
         with:
           name: my-lambda-artifact
 
-      # Dynamically find and deploy the ZIP file to AWS Lambda
+      # Deploy the downloaded ZIP file
       - name: Deploy to AWS Lambda
         run: |
           ZIP_FILE=$(find . -name "*.zip")
