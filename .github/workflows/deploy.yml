@@ -3,7 +3,7 @@ name: Build and Deploy to AWS Lambda
 on:
   push:
     branches:
-      - main  # Trigger on push to the main branch
+      - main
 
 jobs:
   build:
@@ -17,19 +17,21 @@ jobs:
         uses: actions/setup-java@v3
         with:
           java-version: '17'
-          distribution: 'temurin'  # Choose the Java distribution you want (temurin, zulu, etc.)
+          distribution: 'temurin'
 
       - name: Build with Maven
         run: mvn clean package
 
-      - name: Zip the Lambda function
-        run: zip -r my-lambda.zip target/*.jar
+      # Verify that the ZIP file is created
+      - name: List contents of target directory
+        run: ls -la target/
 
+      # Since the ZIP is already built, upload it directly
       - name: Upload Lambda Artifact
-        uses: actions/upload-artifact@v3  # Updated to v3
+        uses: actions/upload-artifact@v3
         with:
           name: my-lambda-artifact
-          path: my-lambda.zip
+          path: target/aws-lambda-user-1.0-SNAPSHOT-lambda-package.zip
 
   deploy:
     needs: build
@@ -47,4 +49,4 @@ jobs:
         run: |
           aws lambda update-function-code \
             --function-name my-lambda-function \
-            --zip-file fileb://my-lambda.zip
+            --zip-file fileb://target/aws-lambda-user-1.0-SNAPSHOT-lambda-package.zip
